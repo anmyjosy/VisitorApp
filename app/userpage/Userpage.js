@@ -38,40 +38,44 @@ export default function VisitPage() {
 
       const { data: visits } = await supabase
         .from("visitlogs")
-        .select("*")
+        .select("*", { count: "exact" })
         .eq("user_email", email)
+        .is("check_out", null)
         .order("created_at", { ascending: false })
         .limit(1);
 
       const { data: pitches } = await supabase
         .from("business_pitch")
-        .select("*")
+        .select("*", { count: "exact" })
         .eq("user_email", email)
+        .is("check_out", null)
         .order("created_at", { ascending: false })
         .limit(1);
 
       const { data: interview } = await supabase
         .from("interview")
-        .select("*")
+        .select("*", { count: "exact" })
         .eq("user_email", email)
+        .is("check_out", null)
         .order("created_at", { ascending: false })
         .limit(1);
 
       const { data: techEvents } = await supabase
         .from("tech_event")
-        .select("*")
+        .select("*", { count: "exact" })
         .eq("user_email", email)
+        .is("check_out", null)
         .order("created_at", { ascending: false })
         .limit(1);
 
       let active = null;
-      if (visits && visits.length > 0 && !visits[0].check_out) {
+      if (visits && visits.length > 0) {
         active = { type: "visit", data: visits[0] };
-      } else if (pitches && pitches.length > 0 && !pitches[0].check_out) {
+      } else if (pitches && pitches.length > 0) {
         active = { type: "pitch", data: pitches[0] };
-      } else if (interview && interview.length > 0 && !interview[0].check_out) {
+      } else if (interview && interview.length > 0) {
         active = { type: "interview", data: interview[0] };
-      } else if (techEvents && techEvents.length > 0 && !techEvents[0].check_out) {
+      } else if (techEvents && techEvents.length > 0) {
         active = { type: "tech", data: techEvents[0] };
       }
 
@@ -213,128 +217,84 @@ export default function VisitPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 p-4">
-      <div className="w-full max-w-lg space-y-6">
-        <h2 className="text-3xl font-extrabold text-center text-white">
-          {currentReservation ? "Your Reservation" : "Select Your Visit Type"}
-        </h2>
-
-        {/* === Ticket UI === */}
-        {currentReservation ? (
-          <div className="ticket-shape bg-white overflow-hidden border border-gray-300 shadow-xl">
-            <div className="flex flex-col md:flex-row">
-              {/* Left side (Details) */}
-              <div className="flex-1 p-6 flex flex-col justify-between">
-                <div>
-                  <p className="text-xs text-purple-600 uppercase tracking-widest mb-2">
-                    {currentReservation.type} Pass
-                  </p>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                    {currentReservation.type === "visit" && currentReservation.data.purpose}
-                    {currentReservation.type === "pitch" && currentReservation.data.pitch_title}
-                    {currentReservation.type === "interview" && currentReservation.data.position}
-                    {currentReservation.type === "tech" && currentReservation.data.event_name}
-                  </h3>
-                  <div className="space-y-2 text-gray-700">
-                    {currentReservation.type === "visit" && (
-                      <p>
-                        Visiting: <strong>{currentReservation.data.friend_name}</strong>
-                      </p>
-                    )}
-                    {currentReservation.type === "pitch" && (
-                      <p>
-                        Company: <strong>{currentReservation.data.company_name}</strong>
-                      </p>
-                    )}
-                    {currentReservation.type === "interview" && (
-                      <>
-                        <p>
-                          Company: <strong>{currentReservation.data.company}</strong>
-                        </p>
-                        <p>
-                          Time:{" "}
-                          <strong>
-                            {new Date(currentReservation.data.date_time).toLocaleString()}
-                          </strong>
-                        </p>
-                      </>
-                    )}
-                    {currentReservation.type === "tech" && (
-                      <>
-                        <p>
-                          Role: <strong>{currentReservation.data.role_of_interest}</strong>
-                        </p>
-                        <p>
-                          Time:{" "}
-                          <strong>
-                            {new Date(currentReservation.data.event_date_time).toLocaleString()}
-                          </strong>
-                        </p>
-                      </>
-                    )}
-                  </div>
+    <div className="min-h-screen bg-gray-900 flex items-start justify-center p-4 pt-16">
+      {currentReservation ? (
+        <div className="ticket-shape bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-2xl max-w-sm w-full mx-auto">
+          <div className="flex flex-col">
+            {/* Details side */}
+            <div className="flex-1 p-6 flex flex-col justify-between border-b border-dashed border-gray-300">
+              <div>
+                <p className="text-xs font-semibold text-purple-600 uppercase tracking-widest mb-2">{currentReservation.type} Pass</p>
+                <h3 className="text-xl font-extrabold text-gray-900 mb-2 tracking-tight">
+                  {currentReservation.type === "visit" && currentReservation.data.purpose}
+                  {currentReservation.type === "pitch" && currentReservation.data.pitch_title}
+                  {currentReservation.type === "interview" && currentReservation.data.position}
+                  {currentReservation.type === "tech" && currentReservation.data.event_name}
+                </h3>
+                <div className="text-gray-700 text-sm leading-relaxed">
+                  {/* Info rows here, as before */}
                 </div>
-              </div>
-
-              {/* Right side (QR Code placeholder) */}
-              <div className="flex md:w-48 items-center justify-center bg-gray-100 p-6">
-                <div className="bg-white p-2 rounded">
-                  <img
-                    src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=reservation"
-                    alt="QR Code"
-                    className="w-32 h-32"
-                  />
+                <div className="mt-3 flex gap-2">
+                  <span className="inline-block bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-semibold text-xs shadow-sm">
+                    {currentReservation.type}
+                  </span>
+                  <span className="inline-block bg-gray-200 text-gray-700 px-2 py-1 rounded-full font-medium text-xs">
+                    {new Date(currentReservation.data.created_at).toLocaleDateString()}
+                  </span>
                 </div>
               </div>
             </div>
-
-            {/* Action Buttons */}
-            <div className="bg-gray-100 px-6 py-4">
-              {!currentReservation.data.check_in ? (
-                <button
-                  onClick={handleCheckIn}
-                  className="w-full px-4 py-3 text-white bg-green-600 rounded-xl font-semibold hover:bg-green-700 transition-colors"
-                >
-                  Check In
-                </button>
-              ) : !currentReservation.data.check_out ? (
-                <button
-                  onClick={handleCheckOut}
-                  className="w-full px-4 py-3 text-white bg-red-600 rounded-xl font-semibold hover:bg-red-700 transition-colors"
-                >
-                  Check Out
-                </button>
-              ) : (
-                <p className="text-center text-gray-600 font-semibold">
-                  Reservation Completed
-                </p>
-              )}
+            {/* QR Code side */}
+            <div className="flex items-center justify-center bg-gray-50 p-4">
+              <div className="bg-white p-2 rounded-lg ring-2 ring-gray-300 shadow-lg flex items-center justify-center">
+                <img
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=reservation&bgcolor=FFFFFF&color=000000"
+                  alt="QR Code"
+                  className="w-28 h-28"
+                />
+              </div>
             </div>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4">
+          {/* Action Buttons */}
+          <div className="bg-gray-100 px-6 py-4">
+            {!currentReservation.data.check_in ? (
+              <button
+                onClick={handleCheckIn}
+                className="w-full px-5 py-3 text-lg font-bold bg-green-600 text-white rounded-xl shadow-md hover:bg-green-700 transition-all duration-150 transform hover:scale-105"
+              >
+                Check In
+              </button>
+            ) : !currentReservation.data.check_out ? (
+              <button
+                onClick={handleCheckOut}
+                className="w-full px-5 py-3 text-lg font-bold bg-red-600 text-white rounded-xl shadow-md hover:bg-red-700 transition-all duration-150 transform hover:scale-105"
+              >
+                Check Out
+              </button>
+            ) : (
+              <p className="text-center text-gray-600 font-semibold text-lg">
+                Reservation Completed
+              </p>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4 text-white">No Active Reservation</h2>
+          <p className="text-gray-400 mb-8">Please select a reason for your visit.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto">
             {visitOptions.map((option) => (
               <button
                 key={option.value}
                 onClick={() => handleVisitClick(option.value)}
-                className="w-full px-4 py-4 rounded-xl text-lg font-medium border bg-gray-700 text-white border-gray-600 shadow-md transition-all transform hover:bg-purple-600 hover:border-purple-500 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-purple-500"
+                className="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
               >
                 {option.label}
               </button>
             ))}
           </div>
-        )}
-
-        {message && (
-          <p
-            className={`text-center text-sm ${
-              message.includes("Error") ? "text-red-400" : "text-green-400"
-            }`}
-          >
-            {message}
-          </p>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

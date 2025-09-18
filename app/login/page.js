@@ -37,15 +37,15 @@ export default function LoginPage() {
       .eq("email", email)
       .single();
 
-    if (!user.name || !user.company || !user.address || !user.dob) {
+    /*if (!user.name || !user.company || !user.address || !user.dob) {
         // Not filled → go to details page
         router.push(`/details?email=${encodeURIComponent(email)}`);
       } else {
         // Already filled → go to user page
         router.push(`/userpage?email=${encodeURIComponent(email)}`);
-      }
+      }*/
     // 3️⃣ Send OTP email
-    /*try {
+    try {
       const response = await fetch("/api/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -60,7 +60,7 @@ export default function LoginPage() {
       router.push(`/login/otp?email=${encodeURIComponent(email)}`);
     } catch (apiError) {
       setMessage("Error sending OTP: " + apiError.message);
-    }*/
+    }
   };
 
   return (
