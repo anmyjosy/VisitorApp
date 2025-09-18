@@ -257,10 +257,6 @@ export default function AdminDashboard() {
           .eq("created_at", activity.created_at) // Match on the original creation timestamp
           .single();
 
-        if (detailsError) {
-          console.error(`Error fetching details for ${activity.purpose} (ID: ${activity.id}):`, detailsError.message);
-          return { ...activity, details: null };
-        }
 
         return { ...activity, details };
       });
