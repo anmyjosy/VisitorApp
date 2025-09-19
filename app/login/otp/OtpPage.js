@@ -43,6 +43,13 @@ export default function OtpPage() {
       );
       // ✅ Check if profile details are filled
       if (!user.name || !user.company || !user.address || !user.dob) {
+        // If it's a new user, set their creation time
+        if (!user.created_at) {
+          await supabase
+            .from("users")
+            .update({ created_at: new Date().toISOString() })
+            .eq("email", email);
+        }
         // Not filled → go to details page
         router.push(`/details?email=${encodeURIComponent(email)}`);
       } else {
