@@ -23,7 +23,7 @@ export default function LoginPage() {
         email,
         phone,
         otp_code: otp,
-        otp_expires_at: expiresAt
+        otp_expires_at: expiresAt,
       },
       { onConflict: "email" }
     );

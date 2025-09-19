@@ -24,12 +24,23 @@ export default function Userpage() {
   }, [setOpenHistory]);
 
   useEffect(() => {
-    if (!email) {
+    const sessionData = localStorage.getItem("session");
+    if (!sessionData) {
       router.push("/login");
       return;
     }
 
-    setLoggedIn(true);
+    const { timestamp } = JSON.parse(sessionData);
+    const tenMinutes = 10 * 60 * 1000;
+    if (Date.now() - timestamp > tenMinutes) {
+      localStorage.removeItem("session");
+      router.push("/login");
+      return;
+    }
+
+    if (setLoggedIn) {
+      setLoggedIn(true);
+    }
 
     const fetchData = async () => {
       const { data: user, error: userError } = await supabase
@@ -99,7 +110,9 @@ export default function Userpage() {
     fetchData();
 
     return () => {
-      setLoggedIn(false);
+      if (setLoggedIn) {
+        setLoggedIn(false);
+      }
     };
   }, [email, router, setLoggedIn]);
 
