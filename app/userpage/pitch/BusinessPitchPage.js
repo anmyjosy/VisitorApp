@@ -1,17 +1,31 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { supabase } from "../../../lib/supabaseClient"; // adjust if path differs
+import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
+import { UserContext } from "../../UserContext";
 
 export default function BusinessPitchPage() {
   const [companyName, setCompanyName] = useState("");
   const [pitchTitle, setPitchTitle] = useState("");
   const [pitchDescription, setPitchDescription] = useState("");
   const [message, setMessage] = useState("");
+  const { setLoggedIn } = useContext(UserContext) || {};
 
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email"); // logged-in user email
+
+  useEffect(() => {
+    if (setLoggedIn) {
+      setLoggedIn(true);
+    }
+    return () => {
+      if (setLoggedIn) {
+        setLoggedIn(false);
+      }
+    };
+  }, [setLoggedIn]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -69,8 +83,40 @@ export default function BusinessPitchPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900 from-gray-900 to-purple-900 p-4">
-      <div className="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-2xl shadow-xl">
+    <div className="relative min-h-screen flex items-center justify-center p-4">
+      {/* Back Arrow */}
+      <button
+        onClick={() => router.back()}
+        className="absolute top-6 left-6 z-20 text-white bg-black/30 rounded-full p-2 hover:bg-black/50 transition-colors"
+        aria-label="Go back"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="https://images.unsplash.com/photo-1448932223592-d1fc686e76ea?q=80&w=869&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="People working in an office"
+          layout="fill"
+          objectFit="cover"
+          quality={80}
+          priority
+          className="animate-fade-in"
+        />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-black/75"></div>
+      </div>
+
+      {/* Page Content */}
+      <div className="relative z-10 w-full max-w-md p-8 space-y-6 bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl">
         <h2 className="text-3xl font-extrabold text-center text-white">
           Submit Your Business Pitch
         </h2>

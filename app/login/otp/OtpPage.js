@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function OtpPage() {
   const [otp, setOtp] = useState("");
@@ -33,6 +34,13 @@ export default function OtpPage() {
         .update({ otp_code: null, otp_expires_at: null })
         .eq("email", email);
 
+      // ✅ Set login state in localStorage
+      localStorage.setItem(
+        "session",
+        JSON.stringify({
+          timestamp: Date.now(),
+        })
+      );
       // ✅ Check if profile details are filled
       if (!user.name || !user.company || !user.address || !user.dob) {
         // Not filled → go to details page
@@ -47,8 +55,24 @@ export default function OtpPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900 p-4">
-      <div className="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-2xl shadow-xl">
+    <div className="relative min-h-screen flex items-center justify-center p-4">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="https://images.unsplash.com/photo-1448932223592-d1fc686e76ea?q=80&w=869&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="People working in an office"
+          layout="fill"
+          objectFit="cover"
+          quality={80}
+          priority
+          className="animate-fade-in"
+        />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-black/75"></div>
+      </div>
+
+      {/* Page Content */}
+      <div className="relative z-10 w-full max-w-md p-8 space-y-6 bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl">
         <h2 className="text-3xl font-extrabold text-center text-white">
           Enter OTP
         </h2>

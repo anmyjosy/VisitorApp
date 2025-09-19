@@ -49,18 +49,18 @@ export default function BusinessPitchesPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-extrabold">Business Pitch Logs</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-8 gap-4">
+        <h1 className="text-3xl sm:text-4xl font-extrabold mb-16"></h1>
         <button
           onClick={() => router.back()}
-          className="px-4 py-2 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
+          className="px-3 py-2 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"
         >
           &larr; Back to Dashboard
         </button>
       </div>
 
       <div className="bg-gray-800/50 rounded-2xl shadow-lg p-6">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto -mx-6 sm:mx-0">
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-gray-600 text-sm text-gray-400 uppercase">

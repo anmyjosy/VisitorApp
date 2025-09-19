@@ -111,7 +111,7 @@ const ActivityTooltip = ({ reservation, children }) => {
         {children}
       </div>
       {show && (
-        <div className="absolute z-10 w-64 p-3 -mt-2 text-sm text-white bg-gray-900 border border-gray-700 rounded-lg shadow-lg -translate-x-1/2 left-1/2">
+        <div className="absolute z-10 w-64 p-3 mt-2 text-sm text-white bg-gray-900 border border-gray-700 rounded-lg shadow-lg left-0">
           <h4 className="mb-2 text-md font-bold text-purple-400 capitalize">{reservation.purpose} Details <button onClick={() => setShow(false)} className="float-right font-normal text-gray-400 hover:text-white">✕</button></h4>
           <div className="space-y-1 text-gray-300">{renderDetails()}</div>
         </div>
