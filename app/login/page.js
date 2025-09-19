@@ -24,6 +24,7 @@ export default function LoginPage() {
         phone,
         otp_code: otp,
         otp_expires_at: expiresAt,
+        created_at: new Date().toISOString(),
       },
       { onConflict: "email" }
     );

@@ -167,9 +167,7 @@ const UserRow = ({ user }) => (
     <td className="p-4 text-gray-300">{user.company}</td>
     <td className="p-4 text-gray-300">{user.phone}</td>
     <td className="p-4 text-gray-400">
-      {user.otp_expires_at
-        ? new Date(user.otp_expires_at).toLocaleString()
-        : "-"}
+      {user.created_at ? new Date(user.created_at).toLocaleString() : "-"}
     </td>
   </tr>
 );
