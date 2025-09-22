@@ -10,22 +10,24 @@ export default function Home() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       {/* Navbar */}
-      <nav className="relative sticky top-0 z-50 flex justify-between items-center px-6 md:px-20 py-6 bg-[#552483] shadow-md">
-        <h1 className="text-xl font-bold text-white">VisitorApp</h1>
+      <nav className="relative sticky top-0 z-50 flex justify-between items-center px-6 md:px-20 py-6 bg-[#552483] shadow-md text-white">
+        {/* Desktop Menu */}
+        <div className="hidden md:flex w-full justify-between items-center">
+          <div className="flex-1">
+            <h1 className="text-xl font-bold text-white">VisitorApp</h1>
+          </div>
 
-        <div className="hidden md:flex space-x-8 text-white">
-          <Link href="#" className="hover:text-gray-200">Home</Link>
-          <Link href="#" className="hover:text-gray-200">About us</Link>
-          <Link href="#" className="hover:text-gray-200">Contact</Link>
-        </div>
+          <div className="flex-1 flex justify-center space-x-8">
+            <Link href="#" className="hover:text-gray-200">Home</Link>
+            <Link href="#" className="hover:text-gray-200">About us</Link>
+            <Link href="#" className="hover:text-gray-200">Contact</Link>
+          </div>
 
-        <div className="hidden md:flex space-x-4">
-          <Link
-            href="/adminlogin"
-            className="text-white hover:text-gray-200"
-          >
-            Manage Reservations
-          </Link>
+          <div className="flex-1 flex justify-end">
+            <Link href="/adminlogin" className="hover:text-gray-200">
+              Manage Reservations
+            </Link>
+          </div>
         </div>
 
         {/* Mobile Menu Button */}
@@ -33,7 +35,7 @@ export default function Home() {
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="text-white focus:outline-none"
-            aria-label="Toggle menu"
+            aria-label="Toggle menu" 
           >
             <svg
               className="w-6 h-6"
@@ -50,6 +52,11 @@ export default function Home() {
               />
             </svg>
           </button>
+        </div>
+        
+        {/* Title for Mobile */}
+        <div className="md:hidden">
+          <h1 className="text-xl font-bold text-white">VisitorApp</h1>
         </div>
 
         {/* Mobile Menu */}

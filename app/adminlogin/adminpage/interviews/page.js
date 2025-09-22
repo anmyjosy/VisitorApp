@@ -58,7 +58,7 @@ export default function InterviewsPage() {
 
   return (
     <div className="min-h-screen bg-purple-100 text-gray-800">
-      <nav className="relative sticky top-0 z-50 flex justify-between items-center px-6 md:px-20 py-4 bg-[#552483] shadow-md text-white">
+      <nav className="relative sticky top-0 z-50 flex justify-between items-center px-6 md:px-20 py-5 bg-[#552483] shadow-md text-white">
         <h1 className="text-xl font-bold text-white">VisitorApp - Admin</h1>
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-4">

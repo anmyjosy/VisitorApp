@@ -214,7 +214,6 @@ export default function Userpage() {
 
   const fetchPastReservations = async () => {
     if (!email) return;
-    setLoading(true);
 
     const tables = [
       { name: "visitlogs", type: "Visit" },
@@ -274,13 +273,6 @@ export default function Userpage() {
     { label: "Attend Tech Event", value: "tech" },
   ];
 
-  if (loading)
-    return (
-      <div className="flex justify-center items-center min-h-screen text-xl font-semibold text-[#552483] bg-white">
-        Loading...
-      </div>
-    );
-
   const formatKey = (key) =>
     key
       .split("_")
@@ -327,7 +319,7 @@ export default function Userpage() {
                   </div>
                 </div>
                 <div className="border-t border-gray-100"></div>
-                <button onClick={handleLogout} className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-red-600 font-medium">
+                <button onClick={handleLogout} className="w-full text-left block px-4 py-2 text-sm text-black hover:bg-gray-100 hover:text-red-600 font-medium">
                   Logout
                 </button>
               </div>
@@ -373,7 +365,7 @@ export default function Userpage() {
 
                 {/* Logout */}
                 <div className="border-t border-white/20 pt-4">
-                  <button onClick={handleLogout} className="w-full text-left px-3 py-2 rounded-md hover:bg-red-500/50 font-medium">
+                  <button onClick={handleLogout} className="w-full text-left px-3 py-2 rounded-md hover:bg-red-500/50 font-medium text-black">
                     Logout
                   </button>
                 </div>

@@ -109,14 +109,6 @@ export default function TechEventPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-white text-[#552483] text-xl font-semibold">
-        Loading...
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-white">
       {/* Back Arrow */}
