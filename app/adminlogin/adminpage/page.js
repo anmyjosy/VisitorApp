@@ -337,33 +337,20 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-purple-100 text-gray-800">
-      <nav className="relative sticky top-0 z-50 flex justify-between items-center px-6 md:px-20 py-6 bg-[#552483] shadow-md text-white">
-        {/* Desktop Menu */}
-        <div className="hidden md:flex w-full justify-between items-center">
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">VisitorApp-Admin</h1>
-          </div>
-
-          <div className="flex-1 flex justify-center space-x-8">
-            <Link href="/" className="hover:text-gray-200">Home</Link>
-            <Link href="#" className="hover:text-gray-200">About us</Link>
-            <Link href="#" className="hover:text-gray-200">Contact</Link>
-          </div>
-
-          <div className="flex-1 flex justify-end">
-            <button
-              onClick={handleLogout}
-              className="text-white hover:text-gray-200"
-            >
-              Logout
-            </button>
-          </div>
+    <div className="min-h-screen flex flex-col bg-white">
+      {/* Navbar */}
+      <nav className="relative sticky top-0 z-50 flex justify-between items-center px-6 md:px-20 py-6 bg-[#552483] shadow-md">
+        <div className="flex-1">
+          <h1 className="text-xl font-bold text-white">VisitorApp-Admin</h1>
         </div>
 
-        {/* Title for Mobile */}
-        <div className="md:hidden">
-          <h1 className="text-xl font-bold text-white">VisitorApp-Admin</h1>
+        <div className="hidden md:flex flex-1 justify-center space-x-8 text-white">
+          <Link href="/">Home</Link>
+          <Link href="#">About us</Link>
+          <Link href="#">Contact</Link>
+        </div>
+        <div className="hidden md:flex flex-1 justify-end">
+          <Link href="/" onClick={handleLogout}>Logout</Link>
         </div>
 
         {/* Mobile Menu Button */}
@@ -371,38 +358,35 @@ export default function AdminDashboard() {
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="text-white focus:outline-none"
-            aria-label="Toggle menu" 
+            aria-label="Toggle menu"
           >
             <svg
               className="w-6 h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"}
+                d={
+                  isMenuOpen
+                    ? "M6 18L18 6M6 6l12 12"
+                    : "M4 6h16M4 12h16m-7 6h7"
+                }
               />
             </svg>
           </button>
         </div>
-        
-        {/* Title for Mobile */}
-        <div className="md:hidden">
-          <h1 className="text-xl font-bold text-white">VisitorApp</h1>
-        </div>
 
-        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="absolute top-full left-0 w-full bg-[#552483] md:hidden shadow-lg">
             <div className="flex flex-col items-center space-y-4 py-4 text-white">
-              <Link href="#" className="hover:text-gray-200">Home</Link>
-              <Link href="#" className="hover:text-gray-200">About us</Link>
-              <Link href="#" className="hover:text-gray-200">Contact</Link>
-              <Link href="/adminlogin" className="hover:text-gray-200">Manage Reservations</Link>
+              <Link href="/">Home</Link>
+              <Link href="#">About us</Link>
+              <Link href="#">Contact</Link>
+              <Link href="/" onClick={handleLogout}>Logout</Link>
             </div>
           </div>
         )}
