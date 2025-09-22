@@ -346,8 +346,8 @@ export default function AdminDashboard() {
 
         <div className="hidden md:flex flex-1 justify-center space-x-8 text-white">
           <Link href="/">Home</Link>
-          <Link href="#">About us</Link>
-          <Link href="#">Contact</Link>
+          <Link href="/about">About us</Link>
+          <Link href="/contact">Contact</Link>
         </div>
         <div className="hidden md:flex flex-1 justify-end">
           <Link href="/" onClick={handleLogout}>Logout</Link>
@@ -384,8 +384,8 @@ export default function AdminDashboard() {
           <div className="absolute top-full left-0 w-full bg-[#552483] md:hidden shadow-lg">
             <div className="flex flex-col items-center space-y-4 py-4 text-white">
               <Link href="/">Home</Link>
-              <Link href="#">About us</Link>
-              <Link href="#">Contact</Link>
+              <Link href="/about">About us</Link>
+              <Link href="/contact">Contact</Link>
               <Link href="/" onClick={handleLogout}>Logout</Link>
             </div>
           </div>

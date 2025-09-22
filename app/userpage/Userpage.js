@@ -297,8 +297,8 @@ export default function Userpage() {
             {!isSidebarOpen && (
               <button onClick={fetchPastReservations} className="hover:text-gray-200">History</button>
             )}
-            <a href="#" className="hover:text-gray-200">About us</a>
-            <Link href="#" className="hover:text-gray-200">Contact</Link>
+            <a href="/about" className="hover:text-gray-200">About us</a>
+            <Link href="/contact" className="hover:text-gray-200">Contact</Link>
           </div>
           {/* Profile Dropdown */}
           <div className="relative hidden md:block" ref={profileMenuRef}>
@@ -355,13 +355,14 @@ export default function Userpage() {
 
                 {/* Links */}
                 <div className="flex flex-col items-start space-y-2 border-t border-white/20 pt-4">
+                  <a href="/" className="w-full text-left px-3 py-2 rounded-md hover:bg-white/10">Home</a>
                   {!isSidebarOpen && (
                     <button onClick={() => { fetchPastReservations(); setIsMobileMenuOpen(false); }} className="w-full text-left px-3 py-2 rounded-md hover:bg-white/10">
                       History
                     </button>
                   )}
-                  <a href="#" className="w-full text-left px-3 py-2 rounded-md hover:bg-white/10">About us</a>
-                  <a href="#" className="w-full text-left px-3 py-2 rounded-md hover:bg-white/10">Contact</a>
+                  <a href="/about" className="w-full text-left px-3 py-2 rounded-md hover:bg-white/10">About us</a>
+                  <a href="/contact" className="w-full text-left px-3 py-2 rounded-md hover:bg-white/10">Contact</a>
                 </div>
 
                 {/* Logout */}

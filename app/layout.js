@@ -39,6 +39,8 @@ export default function RootLayout({ children }) {
   const noNavPaths = [
     "/",
     "/login",
+    "/about",
+    "/contact",
     "/details",
     "/userpage",
     "/userpage/visit",
