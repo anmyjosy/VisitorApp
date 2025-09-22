@@ -14,11 +14,11 @@ import { supabase } from "../../../lib/supabaseClient";
 
 // Simple stat card component
 const StatCard = ({ title, value, icon }) => (
-  <div className="bg-gray-800 p-6 rounded-2xl shadow-lg flex items-center space-x-4">
-    <div className="bg-purple-600/20 p-3 rounded-full">{icon}</div>
+  <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200 flex items-center space-x-4">
+    <div className="bg-purple-100 text-purple-600 p-3 rounded-full">{icon}</div>
     <div>
-      <p className="text-sm text-gray-400">{title}</p>
-      <p className="text-2xl font-bold text-white">{value}</p>
+      <p className="text-sm text-gray-500">{title}</p>
+      <p className="text-2xl font-bold text-gray-900">{value}</p>
     </div>
   </div>
 );
@@ -27,11 +27,11 @@ const StatCard = ({ title, value, icon }) => (
 const NavButtonCard = ({ title, icon, onClick }) => (
   <button
     onClick={onClick}
-    className="bg-gray-800 p-6 rounded-2xl shadow-lg flex items-center space-x-4 text-left w-full hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
+    className="bg-white p-6 rounded-2xl shadow-md border border-gray-200 flex items-center space-x-4 text-left w-full hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
   >
-    <div className="bg-purple-600/20 p-3 rounded-full">{icon}</div>
+    <div className="bg-purple-100 text-purple-600 p-3 rounded-full">{icon}</div>
     <div>
-      <p className="text-lg font-bold text-white">{title}</p>
+      <p className="text-lg font-bold text-gray-900">{title}</p>
     </div>
   </button>
 );
@@ -40,7 +40,7 @@ ChartJS.register(ArcElement, Tooltip, Legend, Colors);
 
 const pieOptions = {
   plugins: {
-    legend: { labels: { color: "#D1D5DB" } },
+    legend: { labels: { color: "#4B5563" } },
   },
 };
 
@@ -111,9 +111,9 @@ const ActivityTooltip = ({ reservation, children }) => {
         {children}
       </div>
       {show && (
-        <div className="absolute z-10 w-64 p-3 mt-2 text-sm text-white bg-gray-900 border border-gray-700 rounded-lg shadow-lg left-0">
-          <h4 className="mb-2 text-md font-bold text-purple-400 capitalize">{reservation.purpose} Details <button onClick={() => setShow(false)} className="float-right font-normal text-gray-400 hover:text-white">✕</button></h4>
-          <div className="space-y-1 text-gray-300">{renderDetails()}</div>
+        <div className="absolute z-10 w-64 p-4 mt-2 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg shadow-xl left-0">
+          <h4 className="mb-2 text-md font-bold text-[#552483] capitalize">{reservation.purpose} Details <button onClick={() => setShow(false)} className="float-right font-normal text-gray-500 hover:text-black">✕</button></h4>
+          <div className="space-y-1 text-gray-600">{renderDetails()}</div>
         </div>
       )}
     </div>
@@ -127,30 +127,30 @@ const ReservationRow = ({ reservation }) => {
   if (reservation.status === "Checked In") statusColor = "text-green-400";
   else if (reservation.status === "Checked Out") statusColor = "text-blue-400";
   return (
-    <tr className="border-b border-gray-700 hover:bg-gray-800">
-      <td className="p-4 text-gray-300">
+    <tr className="border-b border-gray-200 hover:bg-gray-50">
+      <td className="p-4 text-gray-700">
         <ActivityTooltip reservation={reservation}>
           <span className="cursor-pointer">{reservation.email}</span>
         </ActivityTooltip>
       </td>
-      <td className="p-4 text-gray-300">{reservation.name}</td>
-      <td className="p-4 text-gray-300 capitalize">{reservation.purpose}</td>
+      <td className="p-4 text-gray-700">{reservation.name}</td>
+      <td className="p-4 text-gray-700 capitalize">{reservation.purpose}</td>
       <td className="p-4">
         <span className={`font-semibold ${statusColor}`}>
           {reservation.status}
         </span>
       </td>
-      <td className="p-4 text-gray-400">
+      <td className="p-4 text-gray-500">
         {reservation.created_at
           ? new Date(reservation.created_at).toLocaleString()
           : "-"}
       </td>
-      <td className="p-4 text-gray-400">
+      <td className="p-4 text-gray-500">
         {reservation.check_in
           ? new Date(reservation.check_in).toLocaleString()
           : "-"}
       </td>
-      <td className="p-4 text-gray-400">
+      <td className="p-4 text-gray-500">
         {reservation.check_out
           ? new Date(reservation.check_out).toLocaleString()
           : "-"}
@@ -161,12 +161,12 @@ const ReservationRow = ({ reservation }) => {
 
 // User Row for the All Users table
 const UserRow = ({ user }) => (
-  <tr className="border-b border-gray-700 hover:bg-gray-800">
-    <td className="p-4 text-gray-300">{user.name}</td>
-    <td className="p-4 text-gray-300">{user.email}</td>
-    <td className="p-4 text-gray-300">{user.company}</td>
-    <td className="p-4 text-gray-300">{user.phone}</td>
-    <td className="p-4 text-gray-400">
+  <tr className="border-b border-gray-200 hover:bg-gray-50">
+    <td className="p-4 text-gray-700">{user.name}</td>
+    <td className="p-4 text-gray-700">{user.email}</td>
+    <td className="p-4 text-gray-700">{user.company}</td>
+    <td className="p-4 text-gray-700">{user.address}</td>
+    <td className="p-4 text-gray-500">
       {user.created_at ? new Date(user.created_at).toLocaleString() : "-"}
     </td>
   </tr>
@@ -183,6 +183,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [searchFilter, setSearchFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
+  const [userNameFilter, setUserNameFilter] = useState("");
   const [pieChartData, setPieChartData] = useState({
     labels: [],
     datasets: [],
@@ -212,6 +213,16 @@ export default function AdminDashboard() {
     return filtered;
 
   }, [recentActivity, dateFilter, searchFilter]);
+
+  // Memoize the filtered users to prevent re-calculation on every render
+  const filteredUsers = useMemo(() => {
+    if (!userNameFilter) {
+      return allUsers;
+    }
+    return allUsers.filter((user) =>
+      user.name.toLowerCase().includes(userNameFilter.toLowerCase())
+    );
+  }, [allUsers, userNameFilter]);
 
   const clearDateFilter = () => {
     setDateFilter("");
@@ -295,7 +306,7 @@ export default function AdminDashboard() {
               "rgba(96, 165, 250, 0.7)", // Checked Out (Blue)
               "rgba(156, 163, 175, 0.7)", // Other (Gray)
             ],
-            borderColor: "#1F2937",
+            borderColor: "#FFFFFF",
             borderWidth: 2,
           },
         ],
@@ -317,191 +328,216 @@ export default function AdminDashboard() {
     setFilteredActivity(latestActivity.filter((item) => item.status === status));
   };
 
-  return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
-      <h1 className="text-3xl md:text-4xl font-extrabold mb-8"></h1>
+  const handleLogout = () => {
+    localStorage.removeItem("admin_session");
+    router.push("/adminlogin");
+  };
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content (Left - 2/3 width) */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Recent Activity Table */}
-          <div className="bg-gray-800/50 rounded-2xl shadow-lg p-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-              <h2 className="text-2xl font-bold">Recent Activity</h2>
-              <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full sm:w-auto">
-                <input
-                  type="text"
-                  placeholder="Search by email..."
-                  value={searchFilter}
-                  onChange={(e) => setSearchFilter(e.target.value)}
-                  className="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-purple-500 focus:border-purple-500 w-full"
-                />
-                <div className="flex items-center space-x-2">
+  return (
+    <div className="min-h-screen bg-purple-100 text-gray-800">
+      <nav className="sticky top-0 z-50 flex justify-between items-center px-6 md:px-20 py-4 bg-[#552483] shadow-md text-white">
+        <h1 className="text-xl font-bold text-white">VisitorApp - Admin</h1>
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 rounded-md text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors"
+        >
+          Logout
+        </button>
+      </nav>
+
+      <div className="p-8">
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content (Left - 2/3 width) */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Recent Activity Table */}
+            <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                <h2 className="text-2xl font-bold text-gray-900">Recent Activity</h2>
+                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full sm:w-auto">
                   <input
-                    type="date"
-                    value={dateFilter}
-                    onChange={(e) => setDateFilter(e.target.value)}
-                    className="bg-gray-700 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-purple-500 focus:border-purple-500 w-full"
+                    type="text"
+                    placeholder="Search by email..."
+                    value={searchFilter}
+                    onChange={(e) => setSearchFilter(e.target.value)}
+                    className="bg-gray-100 border border-gray-300 rounded-md px-3 py-2 text-gray-800 focus:ring-purple-500 focus:border-purple-500 w-full"
                   />
-                  {dateFilter && (
-                    <button onClick={clearDateFilter} className="text-gray-400 hover:text-white" title="Clear filter">
-                      &#x2715;
-                    </button>
-                  )}
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="date"
+                      value={dateFilter}
+                      onChange={(e) => setDateFilter(e.target.value)}
+                      className="bg-gray-100 border border-gray-300 rounded-md px-3 py-2 text-gray-800 focus:ring-purple-500 focus:border-purple-500 w-full"
+                    />
+                    {dateFilter && (
+                      <button onClick={clearDateFilter} className="text-gray-500 hover:text-black" title="Clear filter">
+                        &#x2715;
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-gray-600 text-sm text-gray-400 uppercase">
-                    <th className="p-4">Email</th>
-                    <th className="p-4">Name</th>
-                    <th className="p-4">Purpose</th>
-                    <th className="p-4">Status</th>
-                    <th className="p-4">Created At</th>
-                    <th className="p-4">Check In</th>
-                    <th className="p-4">Check Out</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    <tr>
-                      <td colSpan="7" className="text-center p-8">
-                        Loading...
-                      </td>
+              <div className="overflow-x-auto max-h-[374px]">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-gray-200 text-sm text-gray-500 uppercase">
+                      <th className="p-4 font-semibold">Email</th>
+                      <th className="p-4 font-semibold">Name</th>
+                      <th className="p-4 font-semibold">Purpose</th>
+                      <th className="p-4 font-semibold">Status</th>
+                      <th className="p-4 font-semibold">Created At</th>
+                      <th className="p-4 font-semibold">Check In</th>
+                      <th className="p-4 font-semibold">Check Out</th>
                     </tr>
-                  ) : (
-                    filteredDisplayActivity.map((item) => (
-                      <ReservationRow key={item.id} reservation={item} />
-                    ))
-                  )}
-                  {!loading && filteredDisplayActivity.length === 0 && (
-                    <tr><td colSpan="7" className="text-center p-8 text-gray-400">No activities found for the selected filters.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* All Users Table */}
-          <div className="bg-gray-800/50 rounded-2xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">All Users</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-gray-600 text-sm text-gray-400 uppercase">
-                    <th className="p-4">Name</th>
-                    <th className="p-4">Email</th>
-                    <th className="p-4">Company</th>
-                    <th className="p-4">Phone</th>
-                    <th className="p-4">Created At</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    <tr>
-                      <td colSpan="5" className="text-center p-8">
-                        Loading...
-                      </td>
-                    </tr>
-                  ) : (
-                    allUsers.map((user) => <UserRow key={user.id} user={user} />)
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        {/* Sidebar (Right - 1/3 width) */}
-        <div className="space-y-8">
-          {/* Stat Card */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
-            <StatCard
-              title="Total Users"
-              value={loading ? "..." : stats.users}
-              icon={"👥"}
-            />
-          </div>
-
-          {/* Pie Chart */}
-          <div className="bg-gray-800/50 rounded-2xl shadow-lg p-6 flex flex-col items-center justify-center">
-            <h2 className="text-2xl font-bold mb-4 text-center">
-              Activity Distribution
-            </h2>
-            {loading ? (
-              <p>Loading Chart...</p>
-            ) : (
-              <div className="w-full max-w-xs mx-auto">
-                <Pie data={pieChartData} options={pieOptions} />
-              </div>
-            )}
-          </div>
-
-          {/* Status List */}
-          <div className="bg-gray-800/50 rounded-2xl shadow-lg p-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
-              <h2 className="text-2xl font-bold">Current Status</h2>
-              <div className="flex flex-wrap gap-2">
-                {["Pending", "Checked In", "Checked Out"].map((status) => (
-                  <button
-                    key={status}
-                    onClick={() => handleStatusFilterChange(status)}
-                    className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${
-                      statusFilter === status
-                        ? "bg-purple-600 text-white"
-                        : "bg-gray-700 hover:bg-gray-600"
-                    }`}
-                  >
-                    {status}
-                  </button>
-                ))}
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td colSpan="7" className="text-center p-8">
+                          Loading...
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredDisplayActivity.map((item) => (
+                        <ReservationRow key={item.id} reservation={item} />
+                      ))
+                    )}
+                    {!loading && filteredDisplayActivity.length === 0 && (
+                      <tr><td colSpan="7" className="text-center p-8 text-gray-500">No activities found for the selected filters.</td></tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
-            <ul className="space-y-3 h-64 overflow-y-auto pr-2">
+
+            {/* All Users Table */}
+            <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                <h2 className="text-2xl font-bold text-gray-900">All Users</h2>
+                <input
+                  type="text"
+                  placeholder="Search by name..."
+                  value={userNameFilter}
+                  onChange={(e) => setUserNameFilter(e.target.value)}
+                  className="bg-gray-100 border border-gray-300 rounded-md px-3 py-2 text-gray-800 focus:ring-purple-500 focus:border-purple-500 w-full sm:w-auto"
+                />
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-gray-200 text-sm text-gray-500 uppercase">
+                      <th className="p-4 font-semibold">Name</th>
+                      <th className="p-4 font-semibold">Email</th>
+                      <th className="p-4 font-semibold">Company</th>
+                      <th className="p-4 font-semibold">Address</th>
+                      <th className="p-4 font-semibold">Created At</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td colSpan="5" className="text-center p-8">
+                          Loading...
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredUsers.map((user) => <UserRow key={user.id} user={user} />)
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar (Right - 1/3 width) */}
+          <div className="space-y-8">
+            {/* Stat Card */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
+              <StatCard
+                title="Total Users"
+                value={loading ? "..." : stats.users}
+                icon={"👥"}
+              />
+            </div>
+
+            {/* Pie Chart */}
+            <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 flex flex-col items-center justify-center">
+              <h2 className="text-2xl font-bold mb-4 text-center text-gray-900">
+                Activity Distribution
+              </h2>
               {loading ? (
-                <p>Loading users...</p>
-              ) : filteredActivity.length > 0 ? (
-                filteredActivity.map((item) => (
-                  <li
-                    key={item.id}
-                    className="flex justify-between items-center bg-gray-800 p-3 rounded-lg"
-                  >
-                    <span className="font-medium text-gray-200">{item.name}</span>
-                    <span className="text-sm text-gray-400">{item.purpose}</span>
-                  </li>
-                ))
+                <p>Loading Chart...</p>
               ) : (
-                <p className="text-gray-400 text-center mt-8">No users with status "{statusFilter}"</p>
+                <div className="w-full max-w-[250px] mx-auto">
+                  <Pie data={pieChartData} options={pieOptions} />
+                </div>
               )}
-            </ul>
-          </div>
+            </div>
 
-          {/* Navigation Cards */}
-          <div className="bg-gray-800/50 rounded-2xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">View Details</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-              <NavButtonCard
-                title="Visits"
-                icon="🚪"
-                onClick={() => router.push("/adminlogin/adminpage/visits")}
-              />
-              <NavButtonCard
-                title="Tech Events"
-                icon="💻"
-                onClick={() => router.push("/adminlogin/adminpage/techevents")}
-              />
-              <NavButtonCard
-                title="Interviews"
-                icon="🎙️"
-                onClick={() => router.push("/adminlogin/adminpage/interviews")}
-              />
-              <NavButtonCard
-                title="Business Pitches"
-                icon="📈"
-                onClick={() => router.push("/adminlogin/adminpage/pitches")}
-              />
+            {/* Status List */}
+            <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
+                <h2 className="text-2xl font-bold text-gray-900">Current Status</h2>
+                <div className="flex flex-wrap gap-2">
+                  {["Pending", "Checked In", "Checked Out"].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => handleStatusFilterChange(status)}
+                      className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${
+                        statusFilter === status
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                      }`}
+                    >
+                      {status}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <ul className="space-y-3 h-64 overflow-y-auto pr-2">
+                {loading ? (
+                  <p>Loading users...</p>
+                ) : filteredActivity.length > 0 ? (
+                  filteredActivity.map((item) => (
+                    <li
+                      key={item.id}
+                      className="flex justify-between items-center bg-gray-50 p-3 rounded-lg"
+                    >
+                      <span className="font-medium text-gray-800">{item.name}</span>
+                      <span className="text-sm text-gray-500">{item.purpose}</span>
+                    </li>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center mt-8">No users with status "{statusFilter}"</p>
+                )}
+              </ul>
+            </div>
+
+            {/* Navigation Cards */}
+            <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
+              <h2 className="text-2xl font-bold mb-4 text-gray-900">View Details</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+                <NavButtonCard
+                  title="Visits"
+                  icon="🚪"
+                  onClick={() => router.push("/adminlogin/adminpage/visits")}
+                />
+                <NavButtonCard
+                  title="Tech Events"
+                  icon="💻"
+                  onClick={() => router.push("/adminlogin/adminpage/techevents")}
+                />
+                <NavButtonCard
+                  title="Interviews"
+                  icon="🎙️"
+                  onClick={() => router.push("/adminlogin/adminpage/interviews")}
+                />
+                <NavButtonCard
+                  title="Business Pitches"
+                  icon="📈"
+                  onClick={() => router.push("/adminlogin/adminpage/pitches")}
+                />
+              </div>
             </div>
           </div>
         </div>

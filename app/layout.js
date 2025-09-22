@@ -1,20 +1,15 @@
 "use client";
 
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "./Navbar";
 import { UserContext } from "./UserContext";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-sans",
 });
 
 export default function RootLayout({ children }) {
@@ -25,6 +20,11 @@ export default function RootLayout({ children }) {
   useEffect(() => {
     const sessionData = localStorage.getItem("session");
     if (sessionData) {
+      // Don't redirect if user is on the details page to complete their profile
+      if (pathname === "/details") {
+        setLoggedIn(true);
+        return;
+      }
       const { timestamp } = JSON.parse(sessionData);
       const tenMinutes = 10 * 60 * 1000;
       if (Date.now() - timestamp < tenMinutes) {
@@ -37,6 +37,10 @@ export default function RootLayout({ children }) {
   }, [pathname]); // Re-check session on route change
 
   const noNavPaths = [
+    "/",
+    "/login",
+    "/details",
+    "/userpage",
     "/userpage/visit",
     "/userpage/pitch",
     "/userpage/interview",
@@ -46,9 +50,7 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${inter.variable} font-sans antialiased`}>
         <UserContext.Provider
           value={{ loggedIn, setLoggedIn, openHistory, setOpenHistory }}
         >

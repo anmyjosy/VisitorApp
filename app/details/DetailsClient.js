@@ -13,15 +13,22 @@ export default function DetailsClient() {
   });
   const [message, setMessage] = useState("");
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const email = searchParams.get("email"); // passed from OTP page
+  const [email, setEmail] = useState(null);
 
   useEffect(() => {
-    // if no email in URL, redirect back
-    if (!email) {
-      router.push("/login");
-    }
-  }, [email, router]);
+    const getUserEmail = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        setEmail(user.email);
+      } else {
+        // if no user, redirect back to login
+        router.push("/login");
+      }
+    };
+    getUserEmail();
+  }, [router]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,6 +38,8 @@ export default function DetailsClient() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("Saving...");
+
+    if (!email) return; // Should not happen, but as a safeguard
 
     const { error } = await supabase
       .from("users")
@@ -46,7 +55,7 @@ export default function DetailsClient() {
       setMessage("Error saving details: " + error.message);
     } else {
       setMessage("Details saved successfully!");
-      router.push(`/userpage?email=${email}`);
+      router.push(`/userpage`);
     }
   };
 

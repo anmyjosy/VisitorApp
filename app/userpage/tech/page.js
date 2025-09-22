@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 import TechPage from "./TechPage";
+import LoadingSpinner from "../../userpage/LoadingSpinner";
 
 export default function Page() {
   return (
-    <Suspense fallback={<div className="text-white">Loading…</div>}>
+    <Suspense fallback={<LoadingSpinner />}>
       <TechPage />
     </Suspense>
   );

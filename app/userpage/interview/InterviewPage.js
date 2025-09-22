@@ -2,31 +2,41 @@
 import { useState, useEffect, useContext } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import Image from "next/image";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { UserContext } from "../../UserContext";
 
 export default function InterviewPage() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const email = searchParams.get("email");
   const { setLoggedIn } = useContext(UserContext) || {};
 
-  useEffect(() => {
-    if (setLoggedIn) {
-      setLoggedIn(true);
-    }
-    return () => {
-      if (setLoggedIn) {
-        setLoggedIn(false);
-      }
-    };
-  }, [setLoggedIn]);
-
+  const [email, setEmail] = useState(null); // State to hold the user's email
   const [company, setCompany] = useState("");
   const [position, setPosition] = useState("");
   const [dateTime, setDateTime] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const sessionData = localStorage.getItem("session");
+    if (!sessionData) {
+      router.replace("/login");
+      return;
+    }
+
+    const { email: sessionEmail, timestamp } = JSON.parse(sessionData);
+    const tenMinutes = 10 * 60 * 1000;
+    if (Date.now() - timestamp > tenMinutes) {
+      localStorage.removeItem("session");
+      router.replace("/login");
+      return;
+    }
+
+    setEmail(sessionEmail);
+
+    if (setLoggedIn) {
+      setLoggedIn(true);
+    }
+  }, [router, setLoggedIn]);
 
   // handle form submit
   const handleSubmit = async (e) => {
@@ -35,6 +45,12 @@ export default function InterviewPage() {
       setMessage("Please fill all fields.");
       return;
     }
+
+    if (!email) {
+      setMessage("Session expired. Please log in again.");
+      return;
+    }
+
     const { data: userData, error: userError } = await supabase
       .from("users")
       .select("name")
@@ -47,13 +63,14 @@ export default function InterviewPage() {
     const userName = userData.name;
 
     setLoading(true);
+    const creationTime = new Date();
     const { error } = await supabase.from("interview").insert([
       {
         user_email: email,
         company: company,
         position: position,
         date_time: dateTime, // Supabase can take ISO string from datetime-local
-        created_at: new Date(),
+        created_at: creationTime,
         check_in: null,
         check_out: null,
       },
@@ -64,7 +81,7 @@ export default function InterviewPage() {
         name: userName,
         purpose: "interview",
         status: "Pending",
-        created_at: new Date(),
+        created_at: creationTime,
         check_in: null,
         check_out: null,
       },
@@ -74,17 +91,17 @@ export default function InterviewPage() {
       setMessage("Error submitting interview: " + error.message);
     } else {
       setMessage("Interview details submitted successfully!");
-      router.push(`/userpage?email=${encodeURIComponent(email)}`);
+      router.push(`/userpage`);
     }
     setLoading(false);
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-white">
       {/* Back Arrow */}
       <button
-        onClick={() => router.back()}
-        className="absolute top-6 left-6 z-20 text-white bg-black/30 rounded-full p-2 hover:bg-black/50 transition-colors"
+        onClick={() => router.push('/userpage')}
+        className="absolute top-6 left-6 z-20 text-[#552483] bg-gray-100 rounded-full p-2 hover:bg-gray-200 transition-colors"
         aria-label="Go back"
       >
         <svg
@@ -94,71 +111,62 @@ export default function InterviewPage() {
           viewBox="0 0 24 24"
           stroke="currentColor"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       </button>
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="https://images.unsplash.com/photo-1448932223592-d1fc686e76ea?q=80&w=869&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="People working in an office"
-          layout="fill"
-          objectFit="cover"
-          quality={80}
-          priority
-          className="animate-fade-in"
-        />
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/75"></div>
-      </div>
 
       {/* Page Content */}
-      <div className="relative z-10 w-full max-w-md p-8 space-y-6 bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl">
-        <h2 className="text-3xl font-extrabold text-center text-white">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-lg border border-[#552483]">
+        <h2 className="text-3xl font-extrabold text-center text-[#552483]">
           Schedule Interview
         </h2>
-        <p className="text-center text-gray-400">
+        <p className="text-center text-gray-600">
           Please provide your interview details below.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block mb-1 text-sm font-medium text-gray-300">
+            <label className="block mb-1 text-sm font-medium text-gray-700">
               Company Name
             </label>
             <input
               type="text"
               value={company}
               onChange={(e) => setCompany(e.target.value)}
-              className="block w-full px-4 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:ring-purple-500 focus:border-purple-500"
+              className="w-full px-3 py-2 mt-1 text-black bg-gray-100 border border-gray-300 rounded-md focus:ring-[#552483] focus:border-[#552483] outline-none"
               placeholder="Enter company name"
               required
             />
           </div>
 
           <div>
-            <label className="block mb-1 text-sm font-medium text-gray-300">
+            <label className="block mb-1 text-sm font-medium text-gray-700">
               Position
             </label>
             <input
               type="text"
               value={position}
               onChange={(e) => setPosition(e.target.value)}
-              className="block w-full px-4 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:ring-purple-500 focus:border-purple-500"
+              className="w-full px-3 py-2 mt-1 text-black bg-gray-100 border border-gray-300 rounded-md focus:ring-[#552483] focus:border-[#552483] outline-none"
               placeholder="Enter position"
               required
             />
           </div>
 
           <div>
-            <label className="block mb-1 text-sm font-medium text-gray-300">
+            <label className="block mb-1 text-sm font-medium text-gray-700">
               Date & Time
             </label>
             <input
               type="datetime-local"
               value={dateTime}
               onChange={(e) => setDateTime(e.target.value)}
-              className="block w-full px-4 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:ring-purple-500 focus:border-purple-500"
+              className="w-full px-3 py-2 mt-1 text-black bg-gray-100 border border-gray-300 rounded-md focus:ring-[#552483] focus:border-[#552483] outline-none"
               required
             />
           </div>
@@ -166,14 +174,14 @@ export default function InterviewPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-4 py-3 text-white bg-purple-600 rounded-xl font-semibold hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-purple-500 disabled:bg-purple-800 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 text-white bg-[#552483] rounded-md font-semibold hover:bg-black transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-[#552483] disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {loading ? "Submitting..." : "Submit Interview"}
           </button>
         </form>
 
         {message && (
-          <p className="text-center text-sm text-purple-400">{message}</p>
+          <p className="text-center text-sm text-[#552483] mt-4">{message}</p>
         )}
       </div>
     </div>

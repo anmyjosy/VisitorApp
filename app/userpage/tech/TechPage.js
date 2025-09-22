@@ -1,27 +1,39 @@
 "use client";
 import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabaseClient";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function TechEventPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const email = searchParams.get("email");
-
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [email, setEmail] = useState(null); // State to hold the user's email
 
   // form fields
   const [eventName, setEventName] = useState("");
   const [eventDateTime, setEventDateTime] = useState("");
   const [roleOfInterest, setRoleOfInterest] = useState("");
-
   const [currentEvent, setCurrentEvent] = useState(null);
 
   useEffect(() => {
+    const sessionData = localStorage.getItem("session");
+    if (!sessionData) {
+      router.replace("/login");
+      return;
+    }
+
+    const { email: sessionEmail, timestamp } = JSON.parse(sessionData);
+    const tenMinutes = 10 * 60 * 1000;
+    if (Date.now() - timestamp > tenMinutes) {
+      localStorage.removeItem("session");
+      router.replace("/login");
+      return;
+    }
+
+    setEmail(sessionEmail);
+
     if (!email) {
-      router.push("/login");
       return;
     }
 
@@ -48,6 +60,11 @@ export default function TechEventPage() {
     e.preventDefault();
     setMessage("Saving event...");
 
+    if (!email) {
+      setMessage("Session expired. Please log in again.");
+      return;
+    }
+
     const { data: userData, error: userError } = await supabase
       .from("users")
       .select("name")
@@ -66,7 +83,6 @@ export default function TechEventPage() {
         event_name: eventName,
         event_date_time: eventDateTime,
         role_of_interest: roleOfInterest,
-        created_at: new Date(),
         created_at: creationTime,
         check_in: null,
         check_out: null,
@@ -79,7 +95,6 @@ export default function TechEventPage() {
         name: userName,
         purpose: "tech",
         status: "Pending",
-        created_at: new Date(),
         created_at: creationTime,
         check_in: null,
         check_out: null,
@@ -90,24 +105,24 @@ export default function TechEventPage() {
       setMessage("Error saving event: " + error.message);
     } else {
       setMessage("Event saved successfully!");
-      router.push(`/userpage?email=${encodeURIComponent(email)}`);
+      router.push(`/userpage`);
     }
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-900 text-white text-xl font-semibold">
+      <div className="flex justify-center items-center min-h-screen bg-white text-[#552483] text-xl font-semibold">
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-white">
       {/* Back Arrow */}
       <button
-        onClick={() => router.back()}
-        className="absolute top-6 left-6 z-20 text-white bg-black/30 rounded-full p-2 hover:bg-black/50 transition-colors"
+        onClick={() => router.push('/userpage')}
+        className="absolute top-6 left-6 z-20 text-[#552483] bg-gray-100 rounded-full p-2 hover:bg-gray-200 transition-colors"
         aria-label="Go back"
       >
         <svg
@@ -117,43 +132,35 @@ export default function TechEventPage() {
           viewBox="0 0 24 24"
           stroke="currentColor"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       </button>
-      <div className="absolute inset-0 z-0">
-              <Image
-                src="https://images.unsplash.com/photo-1448932223592-d1fc686e76ea?q=80&w=869&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                alt="People working in an office"
-                layout="fill"
-                objectFit="cover"
-                quality={80}
-                priority
-                className="animate-fade-in"
-              />
-              {/* Dark overlay */}
-              <div className="absolute inset-0 bg-black/75"></div>
-            </div>
-      <div className="relative z-10 w-full max-w-md p-8 space-y-6 bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl">
-        <h2 className="text-3xl font-extrabold text-center text-white">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-lg border border-[#552483]">
+        <h2 className="text-3xl font-extrabold text-center text-[#552483]">
           Attend Tech Event
         </h2>
-        <p className="text-center text-gray-400">
+        <p className="text-center text-gray-600">
           Fill out the details to register.
         </p>
 
         {currentEvent ? (
-          <div className="bg-gray-700 text-white p-4 rounded-lg shadow-md space-y-2">
-            <p>
+          <div className="bg-gray-100 text-black p-4 rounded-lg border border-gray-200 space-y-2">
+            <p className="text-black">
               <strong>Event:</strong> {currentEvent.event_name}
             </p>
-            <p>
+            <p className="text-black">
               <strong>Date & Time:</strong>{" "}
               {new Date(currentEvent.event_date_time).toLocaleString()}
             </p>
-            <p>
+            <p className="text-black">
               <strong>Role:</strong> {currentEvent.role_of_interest}
             </p>
-            <p className="text-green-400 font-semibold pt-2">
+            <p className="text-[#552483] font-semibold pt-2">
               You have registered for this event.
             </p>
           </div>
@@ -165,7 +172,7 @@ export default function TechEventPage() {
               value={eventName}
               onChange={(e) => setEventName(e.target.value)}
               required
-              className="w-full px-3 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:ring-purple-500 focus:border-purple-500"
+              className="w-full px-3 py-2 mt-1 text-black bg-gray-100 border border-gray-300 rounded-md focus:ring-[#552483] focus:border-[#552483] outline-none"
             />
             <input
               type="datetime-local"
@@ -173,7 +180,7 @@ export default function TechEventPage() {
               value={eventDateTime}
               onChange={(e) => setEventDateTime(e.target.value)}
               required
-              className="w-full px-3 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:ring-purple-500 focus:border-purple-500"
+              className="w-full px-3 py-2 mt-1 text-black bg-gray-100 border border-gray-300 rounded-md focus:ring-[#552483] focus:border-[#552483] outline-none"
             />
             <input
               type="text"
@@ -181,11 +188,11 @@ export default function TechEventPage() {
               value={roleOfInterest}
               onChange={(e) => setRoleOfInterest(e.target.value)}
               required
-              className="w-full px-3 py-2 mt-1 text-white bg-gray-700 border border-gray-600 rounded-md focus:ring-purple-500 focus:border-purple-500"
+              className="w-full px-3 py-2 mt-1 text-black bg-gray-100 border border-gray-300 rounded-md focus:ring-[#552483] focus:border-[#552483] outline-none"
             />
             <button
               type="submit"
-              className="w-full px-4 py-3 text-white bg-purple-600 rounded-xl font-semibold hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-purple-500"
+              className="w-full px-4 py-3 text-white bg-[#552483] rounded-md font-semibold hover:bg-black transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-[#552483]"
             >
               Register Event
             </button>
@@ -193,7 +200,7 @@ export default function TechEventPage() {
         )}
 
         {message && (
-          <p className="text-center text-sm text-purple-400 mt-4">{message}</p>
+          <p className="text-center text-sm text-[#552483] mt-4">{message}</p>
         )}
       </div>
     </div>
