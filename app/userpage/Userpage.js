@@ -293,6 +293,7 @@ export default function Userpage() {
       <nav className="sticky top-0 z-50 flex justify-between items-center px-6 md:px-20 py-4 bg-[#552483] shadow-md text-white">
         <h1 className="text-xl font-bold text-white">VisitorApp</h1>
           <div className="hidden md:flex items-center space-x-8">
+            <Link href="/">Home</Link>
             {!isSidebarOpen && (
               <button onClick={fetchPastReservations} className="hover:text-gray-200">History</button>
             )}
