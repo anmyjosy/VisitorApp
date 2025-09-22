@@ -16,57 +16,56 @@ export default function Home() {
           <div className="flex-1">
             <h1 className="text-xl font-bold text-white">VisitorApp</h1>
           </div>
-
           <div className="flex-1 flex justify-center space-x-8">
-            <Link href="#" className="hover:text-gray-200">Home</Link>
-            <Link href="#" className="hover:text-gray-200">About us</Link>
-            <Link href="#" className="hover:text-gray-200">Contact</Link>
+            <Link href="/">Home</Link>
+            <Link href="#">About us</Link>
+            <Link href="#">Contact</Link>
           </div>
-
           <div className="flex-1 flex justify-end">
-            <Link href="/adminlogin" className="hover:text-gray-200">
+            <Link href="/adminlogin" className="text-white">
               Manage Reservations
             </Link>
           </div>
         </div>
 
+        {/* Mobile Title */}
+        <div className="md:hidden">
+          <h1 className="text-xl font-bold text-white">VisitorApp</h1>
+        </div>
         {/* Mobile Menu Button */}
         <div className="md:hidden">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="text-white focus:outline-none"
-            aria-label="Toggle menu" 
+            aria-label="Toggle menu"
           >
             <svg
               className="w-6 h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"}
+                d={
+                  isMenuOpen
+                    ? "M6 18L18 6M6 6l12 12"
+                    : "M4 6h16M4 12h16m-7 6h7"
+                }
               />
             </svg>
           </button>
         </div>
-        
-        {/* Title for Mobile */}
-        <div className="md:hidden">
-          <h1 className="text-xl font-bold text-white">VisitorApp</h1>
-        </div>
 
-        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="absolute top-full left-0 w-full bg-[#552483] md:hidden shadow-lg">
             <div className="flex flex-col items-center space-y-4 py-4 text-white">
-              <Link href="#" className="hover:text-gray-200">Home</Link>
-              <Link href="#" className="hover:text-gray-200">About us</Link>
-              <Link href="#" className="hover:text-gray-200">Contact</Link>
-              <Link href="/adminlogin" className="hover:text-gray-200">Manage Reservations</Link>
+              <Link href="/">Home</Link>
+              <Link href="#">About us</Link>
+              <Link href="#">Contact</Link>
+              <Link href="/adminlogin">Manage Reservations</Link>
             </div>
           </div>
         )}

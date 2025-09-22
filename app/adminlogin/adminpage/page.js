@@ -361,6 +361,11 @@ export default function AdminDashboard() {
           </div>
         </div>
 
+        {/* Title for Mobile */}
+        <div className="md:hidden">
+          <h1 className="text-xl font-bold text-white">VisitorApp-Admin</h1>
+        </div>
+
         {/* Mobile Menu Button */}
         <div className="md:hidden">
           <button
