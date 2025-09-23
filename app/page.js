@@ -222,7 +222,7 @@ export default function Home() {
               <ul className="mt-2 space-y-2 text-sm">
                 <li><Link href="/" className="text-gray-300 hover:text-white">Home</Link></li>
                 <li><Link href="/about" className="text-gray-300 hover:text-white">About Us</Link></li>
-                <li><Link href="#" className="text-gray-300 hover:text-white">Contact</Link></li>
+                <li><Link href="/contact" className="text-gray-300 hover:text-white">Contact</Link></li>
                 <li><Link href="/adminlogin" className="text-gray-300 hover:text-white">Admin</Link></li>
               </ul>
             </div>
