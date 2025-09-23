@@ -17,24 +17,62 @@ export default function LoginPage() {
   const [dob, setDob] = useState("");
   const [loading, setLoading] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const timerIntervalRef = useRef(null);
   const inputsRef = useRef([]);
   const router = useRouter();
 
   // Check session on mount
   useEffect(() => {
-    const sessionData = localStorage.getItem("session");
-    if (sessionData) {
-      const { timestamp } = JSON.parse(sessionData);
-      const tenMinutes = 10 * 60 * 1000;
-      if (Date.now() - timestamp < tenMinutes) {
-        router.replace("/userpage");
+    const checkSession = async () => {
+      const sessionData = localStorage.getItem("session");
+      if (sessionData) {
+        const { email, timestamp } = JSON.parse(sessionData);
+        const tenMinutes = 10 * 60 * 1000;
+        if (Date.now() - timestamp < tenMinutes) {
+          // Session is valid, now check if profile is complete
+          const { data: user, error } = await supabase
+            .from("users")
+            .select("name, company, address, dob")
+            .eq("email", email)
+            .single();
+
+          if (user && user.name && user.company && user.address) {
+            router.replace("/userpage");
+          } else if (user) {
+            // User exists but profile is incomplete, show details form
+            setEmail(email);
+            setName(user.name || "");
+            setCompany(user.company || "");
+            setAddress(user.address || "");
+            setDob(user.dob || "");
+            setShowDetailsForm(true);
+            setShowOtpForm(true); // Keep this true to bypass the email form
+          }
+          // If profile is not complete, do nothing, allowing the login page to render
+          // The user will be prompted to log in again, which will lead to the details form.
+        } else {
+          localStorage.removeItem("session");
+        }
       } else {
-        localStorage.removeItem("session");
+        setShowOtpForm(false);
       }
-    } else {
-      setShowOtpForm(false);
-    }
+    };
+    checkSession();
   }, [router]);
+
+  // Timer effect
+  useEffect(() => {
+    if (timer > 0) {
+      timerIntervalRef.current = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    } else {
+      clearInterval(timerIntervalRef.current);
+    }
+
+    return () => clearInterval(timerIntervalRef.current);
+  }, [timer]);
 
   // Email submit handler
   const handleEmailSubmit = async (e) => {
@@ -67,6 +105,7 @@ export default function LoginPage() {
       if (!response.ok) throw new Error("Failed to send OTP email.");
       setMessage("An OTP has been sent to your email.");
       setShowOtpForm(true);
+      setTimer(60); // Start 60-second timer
 
       setTimeout(() => {
         inputsRef.current[0]?.focus();
@@ -76,6 +115,45 @@ export default function LoginPage() {
     }
 
     setLoading(false);
+  };
+
+  // Resend OTP handler
+  const handleResendOtp = async () => {
+    if (loading) return;
+    setLoading(true);
+    setMessage("Resending OTP...");
+
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+
+    const { error } = await supabase.from("users").upsert(
+      { email, otp_code: otp, otp_expires_at: expiresAt },
+      { onConflict: "email" }
+    );
+
+    if (error) {
+      setMessage("Error resending OTP: " + error.message);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/send-otp', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      });
+      if (!response.ok) throw new Error("Failed to resend OTP email.");
+      setMessage('A new OTP has been sent.');
+      setTimer(60); // Restart timer
+    } catch (apiError) {
+      setMessage("Error resending OTP: " + apiError.message);
+    }
+    setLoading(false);
+    // After resending, clear the OTP input fields and focus the first one
+    setDigits(["", "", "", ""]);
+    inputsRef.current[0]?.focus();
+
   };
 
   // OTP submit handler
@@ -287,7 +365,7 @@ export default function LoginPage() {
 
         {/* Right Side Form */}
         <div className="flex flex-1 items-start md:items-center justify-center w-full md:w-2/5 bg-transparent p-6 md:p-12 relative z-10 -mt-12 md:mt-0">
-          <div className="w-full max-w-md bg-white shadow-xl rounded-xl p-8 space-y-6 border border-gray-100">
+          <div className="w-full max-w-md bg-white shadow-xl rounded-xl p-6 md:p-8 space-y-6 border border-gray-100 -mt-[180px] md:mt-0">
             <h2 className="text-2xl font-bold text-center text-[#552483]">
               {showDetailsForm
                 ? "Complete Your Profile"
@@ -347,6 +425,21 @@ export default function LoginPage() {
                     ))}
                   </div>
                 </div>
+                <div className="text-center text-sm">
+                  {timer > 0 ? (
+                    <p className="text-gray-500">Resend OTP in {timer}s</p>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleResendOtp}
+                      className="font-medium text-[#552483] hover:text-black disabled:text-gray-400 disabled:cursor-not-allowed"
+                      disabled={loading}
+                    >
+                      Resend OTP
+                    </button>
+                  )}
+                </div>
+
                 <button
                   type="submit"
                   disabled={loading}
@@ -360,66 +453,132 @@ export default function LoginPage() {
                 </button>
               </form>
             ) : (
-              <form className="space-y-4" onSubmit={handleDetailsSubmit}>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2 mt-1 text-black bg-gray-100 border border-gray-300 rounded-md focus:ring-[#552483] focus:border-[#552483] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Company
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                    className="w-full px-3 py-2 mt-1 text-black bg-gray-100 border border-gray-300 rounded-md focus:ring-[#552483] focus:border-[#552483] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Address
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    className="w-full px-3 py-2 mt-1 text-black bg-gray-100 border border-gray-300 rounded-md focus:ring-[#552483] focus:border-[#552483] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Date of Birth
-                  </label>
-                  <input
-                    type="date"
-                    value={dob}
-                    onChange={(e) => setDob(e.target.value)}
-                    className="w-full px-3 py-2 mt-1 text-black bg-gray-100 border border-gray-300 rounded-md focus:ring-[#552483] focus:border-[#552483] outline-none"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`w-full px-4 py-2 text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                    loading
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-[#552483] hover:bg-black focus:ring-[#552483]"
-                  }`}
-                >
-                  {loading ? "Saving..." : "Save & Continue"}
-                </button>
-              </form>
+              <form
+  className="
+    space-y-4 
+    max-h-[80vh] 
+    overflow-y-auto 
+    scrollbar-thin scrollbar-thumb-gray-300 
+    px-2 sm:px-4
+  "
+  onSubmit={handleDetailsSubmit}
+>
+  {/* One column on mobile, two on md and above */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {/* Email always full width */}
+    <div className="md:col-span-2">
+      <label className="block text-base sm:text-sm font-medium text-gray-700">
+        Email
+      </label>
+      <input
+        type="email"
+        value={email}
+        readOnly
+        className="
+          w-full px-3 py-3 sm:py-2 mt-1 
+          text-gray-500 bg-gray-200 
+          border border-gray-300 rounded-lg cursor-not-allowed 
+          text-base sm:text-sm
+        "
+      />
+    </div>
+
+    <div>
+      <label className="block text-base sm:text-sm font-medium text-gray-700">
+        Full Name
+      </label>
+      <input
+        type="text"
+        required
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        className="
+          w-full px-3 py-3 sm:py-2 mt-1 
+          text-black bg-gray-100 
+          border border-gray-300 rounded-lg 
+          focus:ring-[#552483] focus:border-[#552483] outline-none
+          text-base sm:text-sm
+        "
+      />
+    </div>
+
+    <div>
+      <label className="block text-base sm:text-sm font-medium text-gray-700">
+        Company
+      </label>
+      <input
+        type="text"
+        required
+        value={company}
+        onChange={(e) => setCompany(e.target.value)}
+        className="
+          w-full px-3 py-3 sm:py-2 mt-1 
+          text-black bg-gray-100 
+          border border-gray-300 rounded-lg 
+          focus:ring-[#552483] focus:border-[#552483] outline-none
+          text-base sm:text-sm
+        "
+      />
+    </div>
+
+    <div>
+      <label className="block text-base sm:text-sm font-medium text-gray-700">
+        Address
+      </label>
+      <input
+        type="text"
+        required
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
+        className="
+          w-full px-3 py-3 sm:py-2 mt-1 
+          text-black bg-gray-100 
+          border border-gray-300 rounded-lg 
+          focus:ring-[#552483] focus:border-[#552483] outline-none
+          text-base sm:text-sm
+        "
+      />
+    </div>
+
+    <div>
+      <label className="block text-base sm:text-sm font-medium text-gray-700">
+        Date of Birth
+      </label>
+      <input
+        type="date"
+        value={dob}
+        onChange={(e) => setDob(e.target.value)}
+        className="
+          w-full px-3 py-3 sm:py-2 mt-1 
+          text-black bg-gray-100 
+          border border-gray-300 rounded-lg 
+          focus:ring-[#552483] focus:border-[#552483] outline-none
+          text-base sm:text-sm
+        "
+      />
+    </div>
+  </div>
+
+  <button
+    type="submit"
+    disabled={loading}
+    className={`
+      w-full 
+      px-4 py-3 sm:py-2 
+      text-white rounded-lg transition-colors 
+      text-base sm:text-sm 
+      focus:outline-none focus:ring-2 focus:ring-offset-2 
+      ${
+        loading
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-[#552483] hover:bg-black focus:ring-[#552483]"
+      }
+    `}
+  >
+    {loading ? "Saving..." : "Save & Continue"}
+  </button>
+</form>
+
             )}
 
             {message && (
