@@ -390,7 +390,11 @@ export default function LoginPage() {
 
         {/* Right Side Form */}
         <div className="flex flex-1 items-start md:items-center justify-center w-full md:w-2/5 bg-transparent p-6 md:p-12 relative z-10 -mt-12 md:mt-0">
-          <div className="w-full max-w-md bg-white shadow-xl rounded-xl p-6 md:p-8 space-y-6 border border-gray-100 -mt-[180px] md:mt-0">
+          <div
+            className={`w-full max-w-md bg-white shadow-xl rounded-xl p-6 md:p-8 space-y-6 border border-gray-100 md:mt-0 ${
+              showDetailsForm ? "-mt-[180px]" : ""
+            }`}
+          >
             <h2 className="text-2xl font-bold text-center text-[#552483]">
               {showDetailsForm
                 ? "Complete Your Profile"
