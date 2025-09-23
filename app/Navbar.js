@@ -105,7 +105,9 @@ const Navbar = () => {
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           {loggedIn ? (
             <>
-              <a href="#" onClick={handleHistoryClick} className={`block ${navLinkClasses("#")}`}>History</a>
+              <a href="#" onClick={handleHistoryClick} className={`block ${navLinkClasses("#")}`}>
+                History
+              </a>
               <Link href="/login" onClick={handleLogout} className={`block ${navLinkClasses("/login")}`}>
                 Logout
               </Link>
