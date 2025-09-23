@@ -183,8 +183,8 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState("Pending");
   const [loading, setLoading] = useState(true);
   const [searchFilter, setSearchFilter] = useState("");
-  const [dateFilter, setDateFilter] = useState("");
-  const [userNameFilter, setUserNameFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState(""); // For recent activity
+  const [userSearchFilter, setUserSearchFilter] = useState(""); // For all users table
   const [pieChartData, setPieChartData] = useState({
     labels: [],
     datasets: [],
@@ -217,13 +217,18 @@ export default function AdminDashboard() {
 
   // Memoize the filtered users to prevent re-calculation on every render
   const filteredUsers = useMemo(() => {
-    if (!userNameFilter) {
+    if (!userSearchFilter) {
       return allUsers;
     }
-    return allUsers.filter((user) =>
-      user.name.toLowerCase().includes(userNameFilter.toLowerCase())
+    const searchTerm = userSearchFilter.toLowerCase();
+    return allUsers.filter(
+      (user) =>
+        user.name?.toLowerCase().includes(searchTerm) ||
+        user.email?.toLowerCase().includes(searchTerm) ||
+        user.company?.toLowerCase().includes(searchTerm) ||
+        user.address?.toLowerCase().includes(searchTerm)
     );
-  }, [allUsers, userNameFilter]);
+  }, [allUsers, userSearchFilter]);
 
   const clearDateFilter = () => {
     setDateFilter("");
@@ -447,7 +452,7 @@ export default function AdminDashboard() {
                       </tr>
                     ) : (
                       filteredDisplayActivity.map((item) => (
-                        <ReservationRow key={item.id} reservation={item} />
+                        <ReservationRow key={`${item.id}-${item.email}-${item.created_at}`} reservation={item} />
                       ))
                     )}
                     {!loading && filteredDisplayActivity.length === 0 && (
@@ -464,9 +469,9 @@ export default function AdminDashboard() {
                 <h2 className="text-2xl font-bold text-gray-900">All Users</h2>
                 <input
                   type="text"
-                  placeholder="Search by name..."
-                  value={userNameFilter}
-                  onChange={(e) => setUserNameFilter(e.target.value)}
+                  placeholder="Search by email..."
+                  value={userSearchFilter}
+                  onChange={(e) => setUserSearchFilter(e.target.value)}
                   className="bg-gray-100 border border-gray-300 rounded-md px-3 py-2 text-gray-800 focus:ring-purple-500 focus:border-purple-500 w-full sm:w-auto"
                 />
               </div>
@@ -548,7 +553,7 @@ export default function AdminDashboard() {
                 ) : filteredActivity.length > 0 ? (
                   filteredActivity.map((item) => (
                     <li
-                      key={item.id}
+                      key={`${item.id}-${item.email}`}
                       className="flex justify-between items-center bg-gray-50 p-3 rounded-lg"
                     >
                       <span className="font-medium text-gray-800">{item.name}</span>
@@ -566,21 +571,25 @@ export default function AdminDashboard() {
               <h2 className="text-2xl font-bold mb-4 text-gray-900">View Details</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
                 <NavButtonCard
+                  key="visits"
                   title="Visits"
                   icon="🚪"
                   onClick={() => router.push("/adminlogin/adminpage/visits")}
                 />
                 <NavButtonCard
+                  key="techevents"
                   title="Tech Events"
                   icon="💻"
                   onClick={() => router.push("/adminlogin/adminpage/techevents")}
                 />
                 <NavButtonCard
+                  key="interviews"
                   title="Interviews"
                   icon="🎙️"
                   onClick={() => router.push("/adminlogin/adminpage/interviews")}
                 />
                 <NavButtonCard
+                  key="pitches"
                   title="Business Pitches"
                   icon="📈"
                   onClick={() => router.push("/adminlogin/adminpage/pitches")}
