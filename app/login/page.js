@@ -22,6 +22,15 @@ export default function LoginPage() {
   const inputsRef = useRef([]);
   const router = useRouter();
 
+  const handleLogout = () => {
+    localStorage.removeItem("session");
+    setShowDetailsForm(false);
+    setShowOtpForm(false);
+    setEmail("");
+    setDigits(["", "", "", ""]);
+    setMessage("You have been logged out.");
+  };
+
   // Check session on mount
   useEffect(() => {
     const checkSession = async () => {
@@ -298,9 +307,17 @@ export default function LoginPage() {
         </div>
 
         <div className="hidden md:flex space-x-4">
-          <Link href="/adminlogin" className="text-white">
-            Manage Reservations
-          </Link>
+          {showDetailsForm ? (
+            <button
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          ) : (
+            <Link href="/adminlogin" className="text-white">
+              Manage Reservations
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -336,7 +353,15 @@ export default function LoginPage() {
               <Link href="/">Home</Link>
               <Link href="/about">About us</Link>
               <Link href="/contact">Contact</Link>
-              <Link href="/adminlogin">Manage Reservations</Link>
+              {showDetailsForm ? (
+                <button
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link href="/adminlogin">Manage Reservations</Link>
+              )}
             </div>
           </div>
         )}
