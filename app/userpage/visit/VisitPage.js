@@ -65,6 +65,8 @@ export default function VisitPage() {
     }
     const userName = userData.name;
 
+    const creationTime = new Date();
+
     // 2. Insert into visitlogs table
     const { error } = await supabase.from("visitlogs").insert([
       {
@@ -73,7 +75,7 @@ export default function VisitPage() {
         friend_name: friendName,
         friend_email: friendEmail,
         purpose: purpose, // fixed purpose
-        created_at: new Date(),
+        created_at: creationTime,
         check_in: null,
         check_out: null,
       },
@@ -84,9 +86,9 @@ export default function VisitPage() {
       {
         email: email,
         name: userName,
-        purpose: "Visit a Friend",
+        purpose: "visit",
         status: "Pending",
-        created_at: new Date(),
+        created_at: creationTime,
         check_in: null,
         check_out: null,
       },

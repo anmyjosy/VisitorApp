@@ -63,6 +63,7 @@ export default function BusinessPitchPage() {
     }
     const userName = userData.name;
 
+    const creationTime = new Date();
     // Insert into business_pitch table
     const { error } = await supabase.from("business_pitch").insert([
       {
@@ -70,7 +71,7 @@ export default function BusinessPitchPage() {
         company_name: companyName,
         pitch_title: pitchTitle,
         pitch_description: pitchDescription,
-        created_at: new Date(),
+        created_at: creationTime,
         check_in: null,
         check_out: null,
       },
@@ -82,7 +83,7 @@ export default function BusinessPitchPage() {
         name: userName,
         purpose: "pitch",
         status: "Pending",
-        created_at: new Date(),
+        created_at: creationTime,
         check_in: null,
         check_out: null,
       },

@@ -48,25 +48,6 @@ const pieOptions = {
 // Tooltip component to show details on hover
 const ActivityTooltip = ({ reservation, children }) => {
   const [show, setShow] = useState(false); // State to control tooltip visibility
-  const tooltipRef = useRef(null); // Ref to the tooltip container
-
-  // Function to handle clicks outside the tooltip to close it
-  const handleClickOutside = (event) => {
-    if (tooltipRef.current && !tooltipRef.current.contains(event.target)) {
-      setShow(false);
-    }
-  };
-
-  useEffect(() => {
-    // Add event listener when the tooltip is shown
-    if (show) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    // Clean up the event listener when the component unmounts or tooltip is hidden
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [show]);
 
   const renderDetails = () => {
     if (!reservation.details) return <p>No details available.</p>;
@@ -107,13 +88,16 @@ const ActivityTooltip = ({ reservation, children }) => {
   };
 
   return (
-    <div className="relative" ref={tooltipRef}>
-      <div onClick={() => setShow(!show)} className="inline-block">
+    <div
+      className="relative"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      <div className="inline-block">
         {children}
       </div>
       {show && (
         <div className="absolute z-10 w-64 p-4 mt-2 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg shadow-xl left-0">
-          <h4 className="mb-2 text-md font-bold text-[#552483] capitalize">{reservation.purpose} Details <button onClick={() => setShow(false)} className="float-right font-normal text-gray-500 hover:text-black">✕</button></h4>
           <div className="space-y-1 text-gray-600">{renderDetails()}</div>
         </div>
       )}
@@ -246,8 +230,7 @@ export default function AdminDashboard() {
       const { data: recentData, error: recentError } = await supabase
         .from("recent")
         .select("*")
-        .order("id", { ascending: false })
-        .limit(20);
+        .order("id", { ascending: false });
 
       if (userError) console.error("Error fetching users:", userError);
       if (recentError) console.error("Error fetching recent activity:", recentError);
@@ -342,7 +325,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-purple-100">
       {/* Navbar */}
       <nav className="relative sticky top-0 z-50 flex justify-between items-center px-6 md:px-20 py-6 bg-[#552483] shadow-md">
         <div className="flex-1">
