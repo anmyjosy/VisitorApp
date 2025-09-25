@@ -280,10 +280,12 @@ export default function Userpage() {
       .join(" ");
 
   const formatValue = (key, value) => {
-    if (value === true) return "Yes";
-    if (value === false) return "No";
-    if ((key.includes("_at") || key.includes("date")) && !isNaN(new Date(value)))
-      return new Date(value).toLocaleString();
+    if (value === true) return "Yes";    if (value === false) return "No";
+    if ((key.includes("_at") || key.includes("date")) && value && !isNaN(new Date(value))) {
+      return new Date(value).toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata"
+    });
+    }
     return String(value);
   };
 
@@ -408,7 +410,7 @@ export default function Userpage() {
                 })}
               </div>
               <div className="text-xs text-gray-400 font-mono">
-                Issued: {new Date(currentReservation.data.created_at).toLocaleString()}
+                Issued: {formatValue("created_at", currentReservation.data.created_at)}
               </div>
               
               <div className="mt-6">
@@ -570,8 +572,8 @@ export default function Userpage() {
                         </p>
                       </div>
                       <div className="mt-3 border-t border-purple-100 pt-3 text-sm text-gray-700 space-y-1">
-                        <p><strong>Checked In:</strong> {new Date(res.check_in).toLocaleString()}</p>
-                        <p><strong>Checked Out:</strong> {new Date(res.check_out).toLocaleString()}</p>
+                        <p><strong>Checked In:</strong> {formatValue("check_in", res.check_in)}</p>
+                        <p><strong>Checked Out:</strong> {formatValue("check_out", res.check_out)}</p>
                       </div>
                     </li>
                   ))}
